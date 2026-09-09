@@ -6,7 +6,7 @@ import LegalBasisPanel from '../components/LegalBasisPanel';
 import SMSPreviewModal from '../components/SMSPreviewModal';
 import {
   DEMO_CLIPS, runMockDetection, runLiveDetection, generateChallan,
-  classifyConfidence, isDuplicateEvent, LIVE_BACKEND_URL
+  classifyConfidence, isDuplicateEvent, LIVE_BACKEND_URL, BACKEND_BASE_URL
 } from '../services/mockDetectionService';
 import { vahanLookup, getViolationHistory } from '../services/vahanLookup';
 import { logAuditEvent, AUDIT_ACTIONS } from '../services/auditLog';
@@ -337,7 +337,10 @@ export default function DetectionModule() {
               { label: 'VAHAN Lookup', color: 'text-amber-400 bg-amber-950/60 border-amber-900' },
               { label: 'Confidence Routing', color: 'text-purple-400 bg-purple-950/60 border-purple-900' },
               { label: 'Audit Trail', color: 'text-rose-400 bg-rose-950/60 border-rose-900' },
-              { label: 'localhost:8000', color: backendOnline ? 'text-emerald-400 bg-emerald-950/60 border-emerald-900' : 'text-slate-400 bg-slate-800/60 border-slate-700' },
+              { 
+                label: BACKEND_BASE_URL.replace(/^https?:\/\//, ''), 
+                color: backendOnline ? 'text-emerald-400 bg-emerald-950/60 border-emerald-900' : 'text-slate-400 bg-slate-800/60 border-slate-700' 
+              },
             ].map(p => (
               <span key={p.label} className={`px-2.5 py-1 rounded border font-semibold ${p.color}`}>
                 {p.label}

@@ -19,7 +19,12 @@
  * }
  */
 
-export const LIVE_BACKEND_URL = 'http://localhost:8000/detect';
+// Dynamic Backend URL: configured via VITE_BACKEND_URL in Vercel or defaults to your ngrok tunnel
+export const BACKEND_BASE_URL = (
+  import.meta.env.VITE_BACKEND_URL || 'https://saloon-rotunda-strict.ngrok-free.dev'
+).replace(/\/+$/, '');
+
+export const LIVE_BACKEND_URL = `${BACKEND_BASE_URL}/detect`;
 
 /**
  * Call the live Python CV backend.
@@ -38,7 +43,10 @@ export async function runLiveDetection(file, clipMeta = {}) {
   const response = await fetch(LIVE_BACKEND_URL, {
     method: 'POST',
     body: formData,
-    // No Content-Type header — browser sets it with boundary for multipart
+    headers: {
+      'ngrok-skip-browser-warning': '69420',
+    },
+    // No Content-Type header — browser automatically sets boundary for multipart
   });
 
   if (!response.ok) {
