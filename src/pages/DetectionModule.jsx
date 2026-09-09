@@ -10,6 +10,9 @@ import {
 } from '../services/mockDetectionService';
 import { vahanLookup, getViolationHistory } from '../services/vahanLookup';
 import { logAuditEvent, AUDIT_ACTIONS } from '../services/auditLog';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../firebase/config';
+import { COLLECTIONS } from '../firebase/collections';
 
 /**
  * SortIQ Enforce — CCTV Violation Detection Module
@@ -47,6 +50,7 @@ export default function DetectionModule() {
   const [error, setError] = useState(null);
   const [detectionSource, setDetectionSource] = useState(null); // 'LIVE_BACKEND' | 'MOCK' | null
   const [backendOnline, setBackendOnline] = useState(null); // null = unknown, true/false
+  const [forcedEventType, setForcedEventType] = useState('auto'); // 'auto' | 'pedestrian' | 'vehicle'
 
   // Track recent events for deduplication (in production, this would query Firestore)
   const recentEvents = useRef([]);
@@ -54,6 +58,7 @@ export default function DetectionModule() {
   const handleSelectClip = (clip) => {
     setSelectedClip(clip);
     setUploadedFile(null);
+    setForcedEventType(clip.forcedResult || 'auto');
     resetDetection();
   };
 
@@ -62,6 +67,13 @@ export default function DetectionModule() {
     if (file) {
       setUploadedFile(file);
       setSelectedClip(null);
+      // Auto-detect based on filename hints if present
+      const lowerName = file.name.toLowerCase();
+      if (lowerName.includes('pedestrian') || lowerName.includes('walk') || lowerName.includes('person')) {
+        setForcedEventType('pedestrian');
+      } else if (lowerName.includes('vehicle') || lowerName.includes('car') || lowerName.includes('scooter') || lowerName.includes('bike')) {
+        setForcedEventType('vehicle');
+      }
       resetDetection();
     }
   };
@@ -108,6 +120,7 @@ export default function DetectionModule() {
           // Fall back to mock detection
           result = await runMockDetection({
             clipId: 'upload',
+            forceType: forcedEventType !== 'auto' ? forcedEventType : null,
             clipMeta: {
               location: 'Uploaded File — Location Unknown',
               gps: { lat: 18.5204, lng: 73.8567 },
@@ -118,6 +131,7 @@ export default function DetectionModule() {
         // Demo clip — always mock
         result = await runMockDetection({
           clipId: selectedClip?.id || 'upload',
+          forceType: forcedEventType !== 'auto' ? forcedEventType : (selectedClip?.forcedResult || null),
           clipMeta: selectedClip || {
             location: 'Uploaded File — Location Unknown',
             gps: { lat: 18.5204, lng: 73.8567 },
@@ -234,6 +248,28 @@ export default function DetectionModule() {
 
       } else {
         // Pedestrian — always to officer queue, never auto-challan
+        const pendingCard = {
+          id: `viol-${Date.now().toString(36).toUpperCase()}`,
+          evidencePhotoUrl: result.cropped_image_url || 'https://placehold.co/480x320/1e293b/94a3b8?text=PEDESTRIAN+EVIDENCE',
+          locationAddress: result.location_address || 'Surveillance Node',
+          gps: result.gps || { lat: 18.5204, lng: 73.8567 },
+          createdAt: Timestamp.now(),
+          confidence: result.confidence || 0.88,
+          cameraId: result.camera_id || 'CAM-CCTV',
+          status: 'PENDING_OFFICER_REVIEW',
+          type: 'PEDESTRIAN_LITTERING',
+          notes: 'AI-detected pedestrian violation awaiting manual officer review per DPDP Act 2023.',
+          source: result.source || 'AI_DETECTION_[SIMULATED]',
+        };
+
+        // Write to Firestore so it immediately appears in the Officer Dashboard Pending Review queue
+        try {
+          await addDoc(collection(db, COLLECTIONS.VIOLATIONS), pendingCard);
+          console.log('[DetectionModule] Pedestrian violation persisted to Firestore pending queue');
+        } catch (err) {
+          console.warn('[DetectionModule] Could not persist pedestrian violation to Firestore:', err.message);
+        }
+
         logAuditEvent({
           action: isAutoApprove
             ? AUDIT_ACTIONS.DETECTION_FLAGGED_REVIEW
@@ -387,6 +423,45 @@ export default function DetectionModule() {
             )}
             <input id="video-upload" type="file" accept="image/*,video/*" className="hidden" onChange={handleFileUpload} />
           </div>
+
+          {/* Incident Type Classification Override for uploaded footage */}
+          {uploadedFile && (
+            <div className="mt-4 p-3.5 bg-slate-950/80 border border-slate-800 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-xs font-semibold text-slate-300">Target Violation Category:</span>
+                <p className="text-[11px] text-slate-500">Ensure model or mock classifies appropriately</p>
+              </div>
+              <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setForcedEventType('auto')}
+                  className={`px-2.5 py-1 rounded font-medium transition-colors ${
+                    forcedEventType === 'auto' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Auto-Detect
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForcedEventType('pedestrian')}
+                  className={`px-2.5 py-1 rounded font-medium transition-colors ${
+                    forcedEventType === 'pedestrian' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  🚶 Pedestrian
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForcedEventType('vehicle')}
+                  className={`px-2.5 py-1 rounded font-medium transition-colors ${
+                    forcedEventType === 'vehicle' ? 'bg-rose-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  🚗 Vehicle
+                </button>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ── DPDP Compliance Notice ─────────────────────────────────────── */}

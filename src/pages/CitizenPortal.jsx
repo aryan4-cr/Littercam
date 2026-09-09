@@ -153,19 +153,19 @@ export default function CitizenPortal() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-12">
       {/* Portal Header */}
-      <div className="bg-slate-900 text-white py-6 px-4 border-b border-slate-800">
+      <div className="bg-slate-900 text-white py-5 sm:py-7 px-4 border-b border-slate-800">
         <div className="max-w-xl mx-auto text-center">
-          <span className="inline-flex items-center gap-1.5 bg-blue-900/80 text-blue-300 text-xs px-2.5 py-1 rounded-full font-mono mb-3 border border-blue-700/50">
+          <span className="inline-flex items-center gap-1.5 bg-blue-900/80 text-blue-300 text-[11px] sm:text-xs px-2.5 py-0.5 sm:py-1 rounded-full font-mono mb-2.5 border border-blue-700/50">
             <Shield className="w-3.5 h-3.5" /> Municipal Civic Services
           </span>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Citizen Reporting Portal</h1>
-          <p className="text-sm text-slate-300 mt-2 max-w-md mx-auto">
-            Report overflowing bins, illegal dumping, and littering incidents to Municipal Enforcement.
+          <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-white">Citizen Reporting Portal</h1>
+          <p className="text-xs sm:text-sm text-slate-300 mt-1.5 max-w-md mx-auto leading-relaxed">
+            Report overflowing bins, illegal dumping, and littering incidents directly to Municipal Enforcement.
           </p>
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto px-4 mt-6">
+      <div className="max-w-xl mx-auto px-3.5 sm:px-4 mt-4 sm:mt-6">
 
         {/* Status Toast */}
         {statusMessage && (

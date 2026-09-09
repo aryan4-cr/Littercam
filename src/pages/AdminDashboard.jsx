@@ -181,10 +181,18 @@ export default function AdminDashboard() {
     setSmsChallan(newChallan);
     setSmsOpen(true);
     setAuditRefreshKey(k => k + 1);
+
+    // If violation is from Firestore, update its status
+    try {
+      const violRef = doc(db, COLLECTIONS.VIOLATIONS, violation.id);
+      await updateDoc(violRef, { status: 'RESOLVED', challanId: newChallan.id, updatedAt: new Date() });
+    } catch (err) {
+      // Ignored for local/seed violations
+    }
   };
 
   // Reject with reason logging
-  const handleReject = (violationId) => {
+  const handleReject = async (violationId) => {
     const violation = pendingQueue.find(v => v.id === violationId);
     const reasonLabel = REJECTION_REASONS.find(r => r.value === rejectReason)?.label || rejectReason;
 
@@ -199,16 +207,23 @@ export default function AdminDashboard() {
     setRejectModalOpen(null);
     setRejectReason('FALSE_POSITIVE');
     setAuditRefreshKey(k => k + 1);
+
+    // If violation is from Firestore, update its status
+    try {
+      const violRef = doc(db, COLLECTIONS.VIOLATIONS, violationId);
+      await updateDoc(violRef, { status: 'DISMISSED', rejectionReason: reasonLabel, updatedAt: new Date() });
+    } catch (err) {
+      // Ignored for local/seed violations
+    }
   };
 
-  // Fetch live reports from Firestore with fallback to SEED_REPORTS
+  // Fetch live reports and live pending violations from Firestore with fallback to seed data
   useEffect(() => {
-    async function loadReports() {
+    async function loadData() {
       try {
         const snap = await getDocs(collection(db, COLLECTIONS.REPORTS));
         if (!snap.empty) {
           const liveReports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          // Merge live reports with seed reports avoiding duplicates
           const liveIds = new Set(liveReports.map(r => r.id));
           const nonDupeSeeds = SEED_REPORTS.filter(r => !liveIds.has(r.id));
           setReports([...liveReports, ...nonDupeSeeds]);
@@ -216,8 +231,27 @@ export default function AdminDashboard() {
       } catch (err) {
         console.info('[AdminDashboard] Using seed reports (Firestore offline or demo mode):', err.message);
       }
+
+      try {
+        const violSnap = await getDocs(collection(db, COLLECTIONS.VIOLATIONS));
+        if (!violSnap.empty) {
+          const liveViolations = violSnap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(v => v.status === 'PENDING_OFFICER_REVIEW');
+          
+          if (liveViolations.length > 0) {
+            setPendingQueue(prev => {
+              const liveIds = new Set(liveViolations.map(v => v.id));
+              const filteredPrev = prev.filter(v => !liveIds.has(v.id));
+              return [...liveViolations, ...filteredPrev];
+            });
+          }
+        }
+      } catch (err) {
+        console.info('[AdminDashboard] Using seed pending queue (Firestore offline or demo mode):', err.message);
+      }
     }
-    loadReports();
+    loadData();
   }, []);
 
   const handleReportStatus = async (reportId, newStatus) => {

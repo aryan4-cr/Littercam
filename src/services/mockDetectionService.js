@@ -49,15 +49,20 @@ export async function runLiveDetection(file, clipMeta = {}) {
   const data = await response.json();
 
   // ── Normalise backend contract to internal format ──────────────────
-  // Backend uses "license-plate" (hyphenated), we use "plate_text" internally.
-  const plateText = data['license-plate'] || null;
-  const isVehicle = data.event_type === 'vehicle';
+  // Backend might send "event_type" or "eventType", "license-plate" or "license_plate" or "plate_text"
+  const rawEventType = (data.event_type || data.eventType || '').toLowerCase().trim();
+  const plateText = data['license-plate'] || data['license_plate'] || data.plate_text || null;
+  
+  // Explicitly identify pedestrian vs vehicle
+  const isPedestrian = rawEventType.includes('pedestrian') || (!plateText && rawEventType !== 'vehicle');
+  const normalizedEventType = isPedestrian ? 'pedestrian' : 'vehicle';
+  const isVehicle = normalizedEventType === 'vehicle';
 
   const result = {
-    event_type: data.event_type,
-    confidence: data.confidence,
+    event_type: normalizedEventType,
+    confidence: Number(data.confidence) || 0.85,
     bbox: data.bbox || [0, 0, 0, 0],
-    cropped_image_url: data.cropped_image_url,
+    cropped_image_url: data.cropped_image_url || data.image_url || '',
     timestamp: data.timestamp || new Date().toISOString(),
     camera_id: data.camera_id || clipMeta.cameraId || 'CAM-LIVE',
     location_address: clipMeta.location || 'Live Detection — Location from Camera Feed',
