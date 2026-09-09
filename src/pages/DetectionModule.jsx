@@ -292,28 +292,27 @@ export default function DetectionModule() {
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <PrototypeBanner />
 
-      <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-5xl mx-auto px-3.5 sm:px-4 py-5 sm:py-8 space-y-6 sm:space-y-8">
 
         {/* Page Header */}
-        <div className="border-b border-slate-800 pb-6">
+        <div className="border-b border-slate-800 pb-5 sm:pb-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-                <Video className="w-7 h-7 text-blue-400" />
-                <span>CCTV Violation Detection Module</span>
+              <h1 className="text-xl sm:text-2xl font-bold text-white flex flex-wrap items-center gap-2 sm:gap-3">
+                <Video className="w-5 h-5 sm:w-7 sm:h-7 text-blue-400 shrink-0" />
+                <span>CCTV Detection Module</span>
                 {detectionSource === 'LIVE_BACKEND' ? (
-                  <span className="text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono font-normal">
+                  <span className="text-[10px] sm:text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono font-normal">
                     LIVE BACKEND
                   </span>
                 ) : (
-                  <span className="text-xs bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-normal">
+                  <span className="text-[10px] sm:text-xs bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-normal">
                     {detectionSource === 'MOCK' ? 'MOCK FALLBACK' : 'SIMULATED AI'}
                   </span>
                 )}
               </h1>
-              <p className="text-sm text-slate-400 mt-1.5 max-w-2xl">
-                Upload an image to send to the live Python CV backend at <code className="text-blue-400">{LIVE_BACKEND_URL}</code>,
-                or select a demo clip for mock detection. Falls back to mock if the backend is offline.
+              <p className="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-2xl leading-relaxed">
+                Upload image/video or select a demo clip. Analyzed via YOLOv8 detection & ANPR pipeline with confidence routing.
               </p>
               {backendOnline === false && (
                 <div className="mt-2 flex items-center gap-2 text-xs text-amber-300">

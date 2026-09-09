@@ -403,21 +403,21 @@ export default function AdminDashboard() {
         </aside>
 
         {/* ── Main Content ──────────────────────────────────────────────── */}
-        <main className="flex-1 overflow-y-auto p-5 lg:p-8">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-5 lg:p-8">
 
           {/* Mobile tab bar */}
-          <div className="md:hidden flex gap-2 mb-5 overflow-x-auto pb-1">
+          <div className="md:hidden flex gap-1.5 mb-4 overflow-x-auto pb-2 scrollbar-none">
             {TABS.map(tab => {
               const Icon = tab.icon;
               return (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                  className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-blue-900/60 text-blue-300 border-blue-700/60'
-                      : 'bg-slate-800 text-slate-400 border-slate-700'
+                      ? 'bg-blue-900/80 text-blue-200 border-blue-600 shadow-sm'
+                      : 'bg-slate-900 text-slate-400 border-slate-800'
                   }`}>
                   <Icon className="w-3.5 h-3.5" />
-                  {tab.label}
+                  <span>{tab.label}</span>
                 </button>
               );
             })}
