@@ -36,7 +36,7 @@ export const LIVE_BACKEND_URL = `${BACKEND_BASE_URL}/detect`;
  * @returns {Promise<object>} Normalised detection result
  * @throws {Error} If the backend is unreachable or returns an error
  */
-export async function runLiveDetection(file, clipMeta = {}) {
+export async function runLiveDetection(file, clipMeta = {}, forceType = null) {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -61,14 +61,20 @@ export async function runLiveDetection(file, clipMeta = {}) {
   const rawEventType = (data.event_type || data.eventType || '').toLowerCase().trim();
   const plateText = data['license-plate'] || data['license_plate'] || data.plate_text || null;
   
-  // Explicitly identify pedestrian vs vehicle
-  const isPedestrian = rawEventType.includes('pedestrian') || (!plateText && rawEventType !== 'vehicle');
-  const normalizedEventType = isPedestrian ? 'pedestrian' : 'vehicle';
+  // If user explicitly forced a type from the UI, use that; otherwise use backend classification
+  let normalizedEventType;
+  if (forceType && forceType !== 'auto') {
+    normalizedEventType = forceType;
+  } else {
+    // Explicitly identify pedestrian vs vehicle from backend response
+    const isPedestrian = rawEventType.includes('pedestrian') || (!plateText && rawEventType !== 'vehicle');
+    normalizedEventType = isPedestrian ? 'pedestrian' : 'vehicle';
+  }
   const isVehicle = normalizedEventType === 'vehicle';
 
   const result = {
     event_type: normalizedEventType,
-    confidence: Number(data.confidence) || 0.85,
+    confidence: data.confidence != null ? Number(data.confidence) : 0.85,
     bbox: data.bbox || [0, 0, 0, 0],
     cropped_image_url: data.cropped_image_url || data.image_url || '',
     timestamp: data.timestamp || new Date().toISOString(),
@@ -164,12 +170,14 @@ function computeIoU(box1, box2) {
   const interArea = Math.max(0, xB - xA) * Math.max(0, yB - yA);
   const box1Area = w1 * h1;
   const box2Area = w2 * h2;
+  const unionArea = box1Area + box2Area - interArea;
 
-  const iou = interArea / (box1Area + box2Area - interArea);
+  if (unionArea <= 0) return 0; // prevent NaN from zero-area bboxes
+  const iou = interArea / unionArea;
   return iou;
 }
 
-export function isDuplicateEvent(newEvent, recentEvents, windowMs = 30000) {
+export function isDuplicateEvent(newEvent, recentEvents = [], windowMs = 30000) {
   const newTime = new Date(newEvent.timestamp).getTime();
   
   for (const event of recentEvents) {

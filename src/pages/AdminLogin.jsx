@@ -30,8 +30,14 @@ export default function AdminLogin() {
     }
   };
 
-  const handleBypassDemoLogin = () => {
-    setDemoOfficerSession(true);
+  const handleBypassDemoLogin = async () => {
+    // Use loginOfficer with demo email — AuthContext fallback will create mock user
+    try {
+      await loginOfficer('demo-officer@municipal.gov.in', 'demo');
+    } catch {
+      // If even the fallback fails, force demo session
+      setDemoOfficerSession(true);
+    }
     navigate(from, { replace: true });
   };
 

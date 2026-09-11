@@ -10,7 +10,7 @@ import {
 } from '../services/mockDetectionService';
 import { vahanLookup, getViolationHistory } from '../services/vahanLookup';
 import { logAuditEvent, AUDIT_ACTIONS } from '../services/auditLog';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, setDoc, doc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { COLLECTIONS } from '../firebase/collections';
 
@@ -113,7 +113,7 @@ export default function DetectionModule() {
           result = await runLiveDetection(uploadedFile, selectedClip || {
             location: 'Uploaded File — Location from Camera Feed',
             gps: { lat: 18.5204, lng: 73.8567 },
-          });
+          }, forcedEventType !== 'auto' ? forcedEventType : null);
           source = 'LIVE_BACKEND';
           setBackendOnline(true);
         } catch (liveErr) {
@@ -267,9 +267,11 @@ export default function DetectionModule() {
         };
 
         // Write to Firestore so it immediately appears in the Officer Dashboard Pending Review queue
+        // Use setDoc with explicit ID so AdminDashboard can updateDoc by this same ID
         try {
-          await addDoc(collection(db, COLLECTIONS.VIOLATIONS), pendingCard);
-          console.log('[DetectionModule] Pedestrian violation persisted to Firestore pending queue');
+          const { id: violId, ...violData } = pendingCard;
+          await setDoc(doc(db, COLLECTIONS.VIOLATIONS, violId), violData);
+          console.log('[DetectionModule] Pedestrian violation persisted to Firestore pending queue:', violId);
         } catch (err) {
           console.warn('[DetectionModule] Could not persist pedestrian violation to Firestore:', err.message);
         }

@@ -147,13 +147,19 @@ export default function CitizenPortal() {
       await loginCitizen();
       setAuthModalOpen(false);
       setStatusMessage({ type: 'success', text: 'Citizen session established. You may now submit reports.' });
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+      setStatusMessage({ type: 'error', text: 'Authentication failed. Please try again.' });
+    }
   };
 
   const formatDate = (val) => {
     if (!val) return '—';
-    const d = val?.toDate ? val.toDate() : new Date(val);
-    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    try {
+      const d = val?.toDate ? val.toDate() : new Date(val);
+      if (isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch { return '—'; }
   };
 
   return (

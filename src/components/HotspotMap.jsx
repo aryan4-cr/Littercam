@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, AlertTriangle, Users, Car, Eye, Info } from 'lucide-react';
-import { SEED_VIOLATIONS } from '../data/seedData';
-import { SEED_REPORTS } from '../data/seedData';
+import { SEED_VIOLATIONS, SEED_REPORTS } from '../data/seedData';
 
 /**
  * SortIQ Enforce — Unified Hotspot Heatmap

@@ -6,8 +6,7 @@ import HotspotMap from '../components/HotspotMap';
 import SMSPreviewModal from '../components/SMSPreviewModal';
 import LegalBasisPanel from '../components/LegalBasisPanel';
 import { useAuth } from '../context/AuthContext';
-import { SEED_VIOLATIONS } from '../data/seedData';
-import { SEED_REPORTS } from '../data/seedData';
+import { SEED_VIOLATIONS, SEED_REPORTS } from '../data/seedData';
 import { generateChallan } from '../services/mockDetectionService';
 import { getViolationHistory } from '../services/vahanLookup';
 import { logAuditEvent, AUDIT_ACTIONS, getAuditLog, getAuditStats } from '../services/auditLog';
@@ -53,10 +52,24 @@ const TABS = [
   { id: 'auditlog',   label: 'Audit Log',        icon: ScrollText },
 ];
 
-// ── Derived seed data helpers ───────────────────────────────────────────────
+// IDs reserved for the pending officer review demo queue — excluded from challans
+const PENDING_DEMO_IDS = new Set();
+
+function buildInitialPendingQueue() {
+  const queue = SEED_VIOLATIONS
+    .filter(v => v.type === 'PEDESTRIAN_LITTERING')
+    .slice(0, 3)
+    .map(v => ({
+      ...v,
+      status: 'PENDING_OFFICER_REVIEW',
+    }));
+  queue.forEach(v => PENDING_DEMO_IDS.add(v.id));
+  return queue;
+}
+
 function buildInitialChallans() {
   return SEED_VIOLATIONS
-    .filter(v => v.status !== 'PENDING_OFFICER_REVIEW')
+    .filter(v => v.status !== 'PENDING_OFFICER_REVIEW' && !PENDING_DEMO_IDS.has(v.id))
     .map(v => ({
       id: v.id.replace('viol-', 'CHN-'),
       violationId: v.id,
@@ -75,16 +88,6 @@ function buildInitialChallans() {
       officerName: v.officerName,
       offenceCount: 1,
       appealInstructions: 'To dispute this challan, file an appeal at your nearest Municipal Corporation office or visit sortiq.gov.in/appeal within 30 days of issue date.',
-    }));
-}
-
-function buildInitialPendingQueue() {
-  return SEED_VIOLATIONS
-    .filter(v => v.type === 'PEDESTRIAN_LITTERING' && v.status === 'PENDING_PAYMENT')
-    .slice(0, 3)
-    .map(v => ({
-      ...v,
-      status: 'PENDING_OFFICER_REVIEW',
     }));
 }
 
@@ -269,14 +272,20 @@ export default function AdminDashboard() {
 
   const formatDate = (val) => {
     if (!val) return '—';
-    const d = val?.toDate ? val.toDate() : new Date(val);
-    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    try {
+      const d = val?.toDate ? val.toDate() : new Date(val);
+      if (isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch { return '—'; }
   };
 
   const formatTime = (val) => {
     if (!val) return '—';
-    const d = new Date(val);
-    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    try {
+      const d = val?.toDate ? val.toDate() : new Date(val);
+      if (isNaN(d.getTime())) return '—';
+      return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch { return '—'; }
   };
 
   const STAT_CARDS = [

@@ -28,37 +28,34 @@ export async function seedFirestore() {
     errors: [],
   };
 
+  // Firestore limits batches to 500 writes. Chunk large arrays.
+  async function commitInBatches(records, collectionName) {
+    const BATCH_LIMIT = 450; // leave some headroom
+    for (let i = 0; i < records.length; i += BATCH_LIMIT) {
+      const chunk = records.slice(i, i + BATCH_LIMIT);
+      const batch = writeBatch(db);
+      for (const record of chunk) {
+        const { id, ...data } = record;
+        const ref = doc(db, collectionName, id);
+        batch.set(ref, data, { merge: true });
+      }
+      await batch.commit();
+    }
+  }
+
   try {
     // ── Seed VAHAN RECORDS ───────────────────────────────────────────────────
-    const vahanBatch = writeBatch(db);
-    for (const record of SEED_VAHAN_RECORDS) {
-      const { id, ...data } = record;
-      const ref = doc(db, COLLECTIONS.VAHAN_RECORDS, id);
-      vahanBatch.set(ref, data, { merge: true });
-    }
-    await vahanBatch.commit();
+    await commitInBatches(SEED_VAHAN_RECORDS, COLLECTIONS.VAHAN_RECORDS);
     summary.vahanRecords = SEED_VAHAN_RECORDS.length;
     console.log(`[SEED] ✓ ${summary.vahanRecords} vahan_records written`);
 
     // ── Seed VIOLATIONS ──────────────────────────────────────────────────────
-    const violBatch = writeBatch(db);
-    for (const record of SEED_VIOLATIONS) {
-      const { id, ...data } = record;
-      const ref = doc(db, COLLECTIONS.VIOLATIONS, id);
-      violBatch.set(ref, data, { merge: true });
-    }
-    await violBatch.commit();
+    await commitInBatches(SEED_VIOLATIONS, COLLECTIONS.VIOLATIONS);
     summary.violations = SEED_VIOLATIONS.length;
     console.log(`[SEED] ✓ ${summary.violations} violations written`);
 
     // ── Seed REPORTS ─────────────────────────────────────────────────────────
-    const repBatch = writeBatch(db);
-    for (const record of SEED_REPORTS) {
-      const { id, ...data } = record;
-      const ref = doc(db, COLLECTIONS.REPORTS, id);
-      repBatch.set(ref, data, { merge: true });
-    }
-    await repBatch.commit();
+    await commitInBatches(SEED_REPORTS, COLLECTIONS.REPORTS);
     summary.reports = SEED_REPORTS.length;
     console.log(`[SEED] ✓ ${summary.reports} reports written`);
 
@@ -76,19 +73,23 @@ export async function seedFirestore() {
  * Removes only the known seed IDs — does not wipe the entire collection.
  */
 export async function clearSeedData() {
-  const allIds = {
-    [COLLECTIONS.VAHAN_RECORDS]: SEED_VAHAN_RECORDS.map(r => r.id),
-    [COLLECTIONS.VIOLATIONS]: SEED_VIOLATIONS.map(r => r.id),
-    [COLLECTIONS.REPORTS]: SEED_REPORTS.map(r => r.id),
-  };
+  try {
+    const allIds = {
+      [COLLECTIONS.VAHAN_RECORDS]: SEED_VAHAN_RECORDS.map(r => r.id),
+      [COLLECTIONS.VIOLATIONS]: SEED_VIOLATIONS.map(r => r.id),
+      [COLLECTIONS.REPORTS]: SEED_REPORTS.map(r => r.id),
+    };
 
-  for (const [collectionName, ids] of Object.entries(allIds)) {
-    const batch = writeBatch(db);
-    for (const id of ids) {
-      const ref = doc(db, collectionName, id);
-      batch.delete(ref);
+    for (const [collectionName, ids] of Object.entries(allIds)) {
+      const batch = writeBatch(db);
+      for (const id of ids) {
+        const ref = doc(db, collectionName, id);
+        batch.delete(ref);
+      }
+      await batch.commit();
+      console.log(`[SEED] Cleared ${ids.length} records from ${collectionName}`);
     }
-    await batch.commit();
-    console.log(`[SEED] Cleared ${ids.length} records from ${collectionName}`);
+  } catch (error) {
+    console.error('[SEED] clearSeedData failed:', error);
   }
 }

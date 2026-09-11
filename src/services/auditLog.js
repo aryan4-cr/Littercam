@@ -22,7 +22,7 @@ export const AUDIT_ACTIONS = {
 
 export function logAuditEvent({ action, details, actorId, relatedIds }) {
   const entry = {
-    id: `AUD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2,4).toUpperCase()}`,
+    id: `AUD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
     action,
     details: details || '',
     actorId: actorId || 'SYSTEM',

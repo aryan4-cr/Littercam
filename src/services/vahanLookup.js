@@ -43,14 +43,17 @@ export async function vahanLookup(plateNumber) {
       };
     }
 
-    const vahanRef = doc(db, COLLECTIONS.VAHAN_RECORDS, findSeedIdByPlate(normalisedPlate));
-    const vahanSnap = await getDoc(vahanRef);
-    if (vahanSnap.exists()) {
-      return {
-        found: true,
-        data: { id: vahanSnap.id, ...vahanSnap.data() },
-        source: 'FIRESTORE',
-      };
+    const seedId = findSeedIdByPlate(normalisedPlate);
+    if (seedId !== 'not-found') {
+      const vahanRef = doc(db, COLLECTIONS.VAHAN_RECORDS, seedId);
+      const vahanSnap = await getDoc(vahanRef);
+      if (vahanSnap.exists()) {
+        return {
+          found: true,
+          data: { id: vahanSnap.id, ...vahanSnap.data() },
+          source: 'FIRESTORE',
+        };
+      }
     }
   } catch (err) {
     console.info('[VAHAN] Firestore unavailable, falling back to local seed data:', err.message);
