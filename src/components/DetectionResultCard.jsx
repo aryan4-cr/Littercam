@@ -53,7 +53,7 @@ export default function DetectionResultCard({
             <h3 className="text-sm font-bold text-slate-400">Detection Discarded — Low Confidence</h3>
             <p className="text-xs text-slate-500 mt-1">
               Confidence <span className="font-mono text-rose-400">{result ? Math.round(result.confidence * 100) : '?'}%</span> is below
-              the actionable threshold (60%). This event has been logged for audit purposes only and will NOT be surfaced as a violation.
+              the actionable threshold (35%). This event has been logged for audit purposes only and will NOT be surfaced as a violation.
             </p>
             <p className="text-[11px] text-slate-600 mt-2 font-mono">
               Logged to audit_log as DETECTION_DISCARDED_LOW_CONFIDENCE

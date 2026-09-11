@@ -25,8 +25,8 @@ import { COLLECTIONS } from '../firebase/collections';
  *   2. Run Detection → mocked YOLOv8 + ANPR pipeline
  *   3. Confidence routing:
  *      - ≥ 0.85: AUTO — proceed to vehicle/pedestrian branch
- *      - 0.60–0.84: NEEDS_REVIEW — flag for officer regardless of type
- *      - < 0.60: DISCARD — log to audit only
+ *      - 0.35–0.84: NEEDS_REVIEW — flag for officer regardless of type
+ *      - < 0.35: DISCARD — log to audit only
  *   4a. Vehicle + plate readable + VAHAN match → Challan → SMS Preview
  *   4b. Vehicle + plate unreadable → Officer queue ("Unreadable Plate")
  *   4c. Vehicle + plate readable + VAHAN not found → Officer queue ("Registration Not Found")
@@ -51,6 +51,7 @@ export default function DetectionModule() {
   const [detectionSource, setDetectionSource] = useState(null); // 'LIVE_BACKEND' | 'MOCK' | null
   const [backendOnline, setBackendOnline] = useState(null); // null = unknown, true/false
   const [forcedEventType, setForcedEventType] = useState('auto'); // 'auto' | 'pedestrian' | 'vehicle'
+  const [processingStage, setProcessingStage] = useState('');
 
   // Track recent events for deduplication (in production, this would query Firestore)
   const recentEvents = useRef([]);
@@ -89,6 +90,7 @@ export default function DetectionModule() {
     setIsDuplicate(false);
     setError(null);
     setDetectionSource(null);
+    setProcessingStage('');
   };
 
   const handleRunDetection = async () => {
@@ -125,6 +127,7 @@ export default function DetectionModule() {
               location: 'Uploaded File — Location Unknown',
               gps: { lat: 18.5204, lng: 73.8567 },
             },
+            onStageUpdate: setProcessingStage,
           });
         }
       } else {
@@ -136,6 +139,7 @@ export default function DetectionModule() {
             location: 'Uploaded File — Location Unknown',
             gps: { lat: 18.5204, lng: 73.8567 },
           },
+          onStageUpdate: setProcessingStage,
         });
       }
 
@@ -361,11 +365,11 @@ export default function DetectionModule() {
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-              <span className="font-semibold text-amber-300">60–84%</span> — Flagged for officer review regardless of type
+              <span className="font-semibold text-amber-300">35–84%</span> — Flagged for officer review regardless of type
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
-              <span className="font-semibold text-slate-400">&lt; 60%</span> — Discarded, audit-logged only
+              <span className="font-semibold text-slate-400">&lt; 35%</span> — Discarded, audit-logged only
             </span>
           </div>
         </div>
@@ -507,10 +511,12 @@ export default function DetectionModule() {
             }`}
           >
             {detectionStatus === 'processing' ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Pipeline Running — YOLOv8 → ANPR → VAHAN…</span>
-              </>
+              <div className="flex items-center gap-2.5">
+                <Loader2 className="w-5 h-5 animate-spin text-blue-300" />
+                <span className="font-mono text-xs sm:text-sm">
+                  {processingStage || 'Processing AI Pipeline — YOLOv8 → ANPR → VAHAN…'}
+                </span>
+              </div>
             ) : (
               <>
                 <Play className="w-5 h-5" />

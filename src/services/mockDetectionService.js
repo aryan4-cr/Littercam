@@ -130,10 +130,12 @@ export const DEMO_CLIPS = [
 ];
 
 // CONFIDENCE THRESHOLD CONFIGURATION
+// Thresholds lowered for demo to allow real AI detections (~35-50% confidence) through.
+// In production, recalibrate against validated model precision/recall curves.
 export const CONFIDENCE_THRESHOLDS = {
   AUTO_APPROVE: 0.85,    // >= this: proceed automatically
-  NEEDS_REVIEW: 0.60,    // >= this but < AUTO_APPROVE: flag for officer review
-  DISCARD: 0.60,         // < this: discard, log to audit only
+  NEEDS_REVIEW: 0.35,    // >= this but < AUTO_APPROVE: flag for officer review
+  DISCARD: 0.35,         // < this: discard, log to audit only
 };
 
 export function classifyConfidence(confidence) {
@@ -193,9 +195,21 @@ function pickRandomPlate() {
   return plates[Math.floor(Math.random() * plates.length)];
 }
 
-export async function runMockDetection({ clipId, forceType = null, clipMeta = {} }) {
-  const delay = 1000 + Math.random() * 1000;
-  await new Promise(resolve => setTimeout(resolve, delay));
+export async function runMockDetection({ clipId, forceType = null, clipMeta = {}, onStageUpdate = null }) {
+  // Simulate realistic AI pipeline processing time (YOLOv8 frame extraction, model inference, ANPR crop)
+  const stages = [
+    'Decompressing video stream & extracting keyframes…',
+    'Running YOLOv8n object detection & motion tracking…',
+    'Analyzing bounding box trajectories & litter classification…',
+    'Performing optical character recognition (EasyOCR)…',
+    'Cross-referencing telemetry with municipal node data…',
+  ];
+
+  for (let i = 0; i < stages.length; i++) {
+    if (onStageUpdate) onStageUpdate(stages[i]);
+    const stageDelay = 600 + Math.random() * 300; // ~700-900ms per stage (total ~3.5-4.5s)
+    await new Promise(resolve => setTimeout(resolve, stageDelay));
+  }
 
   const isUpload = clipId === 'upload';
   let eventType = forceType || clipMeta.forcedResult;

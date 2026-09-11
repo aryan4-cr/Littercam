@@ -25,7 +25,7 @@ const CATEGORIES = [
   { value: 'Overflowing Bin', label: 'Overflowing Garbage Bin / Dustbin' },
   { value: 'Illegal Dumping', label: 'Illegal Solid Waste Dumping' },
   { value: 'Vehicle Littering', label: 'Vehicle Littering Observed (Plate noted)' },
-  { value: 'Overflowing Bin', label: 'Drain / Nala Blocked by Garbage' },
+  { value: 'Blocked Drain', label: 'Drain / Nala Blocked by Garbage' },
   { value: 'Other Civic Offense', label: 'Other Municipal Infrastructure Offense' },
 ];
 
@@ -95,8 +95,14 @@ export default function CitizenPortal() {
 
   const handleSubmitReport = async (e) => {
     e.preventDefault();
-    if (!currentUser) { setAuthModalOpen(true); return; }
+    if (!currentUser) {
+      setAuthModalOpen(true);
+      return;
+    }
     setSubmitting(true);
+
+    // Simulate realistic civic dispatch & evidence transmission delay (1.4s - 1.8s)
+    await new Promise(r => setTimeout(r, 1400 + Math.random() * 400));
 
     const newReport = {
       citizenId: currentUser.uid || 'demo-citizen',
