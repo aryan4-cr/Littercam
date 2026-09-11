@@ -24,7 +24,7 @@ import { AlertTriangle, Car, User, Shield, CheckCircle2, Clock, MapPin, Receipt,
  */
 export default function DetectionResultCard({
   result, vahanData, vahanNotFound, challan, status,
-  confidenceTier, ocrFailed, isDuplicate,
+  confidenceTier, ocrFailed, isDuplicate, detectionSource,
   onPreviewSMS, onDismiss
 }) {
   if (status === 'idle') return null;
@@ -110,7 +110,7 @@ export default function DetectionResultCard({
     );
     if (confidenceTier === 'NEEDS_REVIEW') return (
       <span className="text-[10px] font-mono font-semibold bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded flex items-center gap-1">
-        <Eye className="w-3 h-3" /> NEEDS REVIEW 60-85%
+      <Eye className="w-3 h-3" /> NEEDS REVIEW 35-85%
       </span>
     );
     return (
@@ -157,9 +157,15 @@ export default function DetectionResultCard({
             </p>
           </div>
         </div>
-        <span className="text-[10px] font-mono bg-slate-950 text-slate-500 border border-slate-800 px-2 py-0.5 rounded">
-          SIMULATED
-        </span>
+        {detectionSource === 'LIVE_BACKEND' ? (
+          <span className="text-[10px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-semibold">
+            LIVE AI
+          </span>
+        ) : (
+          <span className="text-[10px] font-mono bg-slate-950 text-slate-500 border border-slate-800 px-2 py-0.5 rounded">
+            SIMULATED
+          </span>
+        )}
       </div>
 
       <div className="p-5 space-y-5">

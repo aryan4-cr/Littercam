@@ -541,6 +541,7 @@ export default function DetectionModule() {
             confidenceTier={confidenceTier}
             ocrFailed={ocrFailed}
             isDuplicate={isDuplicate}
+            detectionSource={detectionSource}
             onPreviewSMS={() => setSmsOpen(true)}
             onDismiss={resetDetection}
           />
