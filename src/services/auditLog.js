@@ -1,5 +1,5 @@
 /**
- * SortIQ Enforce — Audit Trail Service
+ * LitterCam — Audit Trail Service
  * Records every automated decision for accountability.
  * In production this writes to Firestore `audit_log` collection.
  * For prototype, maintains an in-memory array.

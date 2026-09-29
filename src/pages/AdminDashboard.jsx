@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 /**
- * SortIQ Enforce — Municipal Officer Dashboard
+ * LitterCam — Municipal Officer Dashboard
  * ====================================================
  * SIMULATED DATA — PROTOTYPE ONLY
  *
@@ -87,7 +87,7 @@ function buildInitialChallans() {
       evidencePhotoUrl: v.evidencePhotoUrl,
       officerName: v.officerName,
       offenceCount: 1,
-      appealInstructions: 'To dispute this challan, file an appeal at your nearest Municipal Corporation office or visit sortiq.gov.in/appeal within 30 days of issue date.',
+      appealInstructions: 'To dispute this challan, file an appeal at your nearest Municipal Corporation office or visit littercam.gov.in/appeal within 30 days of issue date.',
     }));
 }
 

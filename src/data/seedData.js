@@ -1,5 +1,5 @@
 /**
- * SortIQ Enforce — Firestore Seed Data
+ * LitterCam — Firestore Seed Data
  * ====================================================
  * SIMULATED DATA — FOR PROTOTYPE / DEVELOPMENT USE ONLY
  * All names, phone numbers, vehicle plates, coordinates, and case IDs

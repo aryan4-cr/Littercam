@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, MessageSquare, AlertTriangle, MapPin, Camera, Receipt, Clock, Copy, CheckCheck } from 'lucide-react';
 
 /**
- * SortIQ Enforce — Mock SMS Preview Modal
+ * LitterCam — Mock SMS Preview Modal
  * ====================================================
  * SIMULATED / PROTOTYPE COMPONENT — NOT CONNECTED TO REAL SMS SERVICE
  * This renders the exact text payload that would be sent via an SMS gateway
@@ -59,7 +59,7 @@ export default function SMSPreviewModal({ isOpen, onClose, challan }) {
   // This is exactly what would be dispatched to the SMS gateway.
   // Character count target: ≤320 characters (2 SMS units @ 160 chars each)
   const smsText = [
-    `[MUNICIPAL ENFORCEMENT - SORTIQ ENFORCE]`,
+    `[MUNICIPAL ENFORCEMENT - LITTERCAM]`,
     `Ref: ${referenceId}`,
     ``,
     `Dear ${challan.offenderName},`,
@@ -75,10 +75,10 @@ export default function SMSPreviewModal({ isOpen, onClose, challan }) {
     `Evidence: ${challan.evidencePhotoUrl || 'On file'}`,
     `GPS: ${gpsLink}`,
     ``,
-    `Pay online at: sortiq.gov.in/pay/${referenceId}`,
+    `Pay online at: littercam.gov.in/pay/${referenceId}`,
     `Helpline: 1800-XXX-XXXX`,
     ``,
-    `${challan.appealInstructions || 'To dispute this challan, file an appeal at your nearest Municipal Corporation office or visit sortiq.gov.in/appeal within 30 days of issue date.'}`,
+    `${challan.appealInstructions || 'To dispute this challan, file an appeal at your nearest Municipal Corporation office or visit littercam.gov.in/appeal within 30 days of issue date.'}`,
     ``,
     `[SIMULATED MESSAGE - PROTOTYPE ONLY]`,
   ].join('\n');
@@ -210,7 +210,7 @@ export default function SMSPreviewModal({ isOpen, onClose, challan }) {
         {/* Modal Footer Actions */}
         <div className="px-5 py-4 border-t border-slate-800 flex items-center justify-between gap-3 mt-2">
           <div className="text-[10px] text-slate-500 max-w-[200px] leading-tight">
-            Gateway: NIC / MSG91 (not configured) · Sender ID: <span className="font-mono">SORTIQ</span>
+            Gateway: NIC / MSG91 (not configured) · Sender ID: <span className="font-mono">LTRCAM</span>
           </div>
 
           <div className="flex gap-2">

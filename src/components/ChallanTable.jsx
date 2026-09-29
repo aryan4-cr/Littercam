@@ -3,7 +3,7 @@ import { Receipt, MessageSquare, ExternalLink, ChevronUp, ChevronDown, CheckCirc
 import SMSPreviewModal from './SMSPreviewModal';
 
 /**
- * SortIQ Enforce — Challan Register Table
+ * LitterCam — Challan Register Table
  * ====================================================
  * SIMULATED DATA — PROTOTYPE ONLY
  * Reusable table for all issued challans.

@@ -3,7 +3,7 @@ import { MapPin, AlertTriangle, Users, Car, Eye, Info } from 'lucide-react';
 import { SEED_VIOLATIONS, SEED_REPORTS } from '../data/seedData';
 
 /**
- * SortIQ Enforce — Unified Hotspot Heatmap
+ * LitterCam — Unified Hotspot Heatmap
  * ====================================================
  * SIMULATED DATA — PROTOTYPE ONLY
  *

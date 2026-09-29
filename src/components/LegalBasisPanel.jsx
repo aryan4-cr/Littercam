@@ -2,7 +2,7 @@ import React from 'react';
 import { Scale, BookOpen, Shield, ChevronDown, ChevronUp, ExternalLink, AlertTriangle } from 'lucide-react';
 
 /**
- * SortIQ Enforce — Legal Basis Info Panel
+ * LitterCam — Legal Basis Info Panel
  * ====================================================
  * Cites the real Indian legislative framework that makes
  * automated municipal littering enforcement legally valid.

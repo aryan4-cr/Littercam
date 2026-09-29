@@ -22,7 +22,7 @@ export default function Navbar() {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-bold tracking-wide text-sm sm:text-lg text-white truncate">SortIQ Enforce</span>
+                <span className="font-bold tracking-wide text-sm sm:text-lg text-white truncate">LitterCam</span>
                 <span className="hidden xs:inline-block text-[9px] sm:text-[10px] bg-slate-800 text-slate-300 font-mono px-1 py-0.2 sm:px-1.5 sm:py-0.5 rounded uppercase border border-slate-700">Gov</span>
               </div>
               <p className="text-[10px] sm:text-xs text-slate-400 font-medium truncate max-w-[170px] sm:max-w-none">Municipal Enforcement</p>

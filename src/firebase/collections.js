@@ -3,7 +3,7 @@ import { db } from './config';
 
 /**
  * Placeholder Firestore Collection References
- * Scaffolding for SortIQ Enforce data model
+ * Scaffolding for LitterCam data model
  */
 export const COLLECTIONS = {
   REPORTS: 'reports',

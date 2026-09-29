@@ -2,7 +2,7 @@ import React from 'react';
 import { AlertTriangle, Car, User, Shield, CheckCircle2, Clock, MapPin, Receipt, Zap, Info, Eye, XCircle, Search } from 'lucide-react';
 
 /**
- * SortIQ Enforce — Detection Result Card
+ * LitterCam — Detection Result Card
  * ====================================================
  * SIMULATED DETECTION OUTPUT — PROTOTYPE ONLY
  * Displays the parsed result from the mock AI detection pipeline,

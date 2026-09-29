@@ -15,7 +15,7 @@ import { db } from '../firebase/config';
 import { COLLECTIONS } from '../firebase/collections';
 
 /**
- * SortIQ Enforce — CCTV Violation Detection Module
+ * LitterCam — CCTV Violation Detection Module
  * ====================================================
  * SIMULATED AI PIPELINE — PROTOTYPE ONLY
  * Route: /admin/detection

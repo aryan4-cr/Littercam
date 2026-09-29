@@ -1,5 +1,5 @@
 /**
- * SortIQ Enforce — Detection Service
+ * LitterCam — Detection Service
  * ====================================================
  * Supports two modes:
  *   1. LIVE — POST to local Python CV backend at LIVE_BACKEND_URL
@@ -345,7 +345,7 @@ export function generateChallan({ detectionResult, vahanData, violationHistory =
     issuedByOfficer: 'Insp. M. Sharma [SIMULATED]',
     offenceCount,
     source: 'AI_DETECTION_[SIMULATED]',
-    appealInstructions: 'To dispute this challan, file an appeal at your nearest Municipal Corporation office or visit sortiq.gov.in/appeal within 30 days of issue date.',
+    appealInstructions: 'To dispute this challan, file an appeal at your nearest Municipal Corporation office or visit littercam.gov.in/appeal within 30 days of issue date.',
     confidenceTier: classifyConfidence(detectionResult.confidence),
   };
 }

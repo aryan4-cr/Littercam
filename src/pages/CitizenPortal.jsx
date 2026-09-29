@@ -10,7 +10,7 @@ import { db } from '../firebase/config';
 import { COLLECTIONS } from '../firebase/collections';
 
 /**
- * SortIQ Enforce — Citizen Civic Reporting Portal
+ * LitterCam — Citizen Civic Reporting Portal
  * ====================================================
  * Route: /report
  * The ONLY citizen-facing module in this system.
@@ -394,7 +394,7 @@ export default function CitizenPortal() {
 
         {/* Footer */}
         <div className="mt-8 text-center text-xs text-slate-500 font-medium space-y-1">
-          <p>SortIQ Enforce Platform — Official Citizen Dispatch Interface</p>
+          <p>LitterCam Platform — Official Citizen Dispatch Interface</p>
           <p className="text-[11px] text-slate-400">All submissions are logged into the municipal enforcement pipeline.</p>
         </div>
       </div>

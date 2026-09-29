@@ -1,5 +1,5 @@
 /**
- * SortIQ Enforce — Mock VAHAN Lookup Service
+ * LitterCam — Mock VAHAN Lookup Service
  * ====================================================
  * SIMULATED SERVICE — FOR PROTOTYPE USE ONLY
  */

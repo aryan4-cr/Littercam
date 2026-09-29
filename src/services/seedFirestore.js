@@ -1,5 +1,5 @@
 /**
- * SortIQ Enforce — Firestore Seed Script
+ * LitterCam — Firestore Seed Script
  * ====================================================
  * SIMULATED DATA — PROTOTYPE USE ONLY
  * Run this from the browser console or a Node.js environment
